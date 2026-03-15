@@ -5,9 +5,9 @@ steps:
     args:
       - 'build'
       - '-t'
-      - 'us-central1-docker.pkg.dev/$PROJECT_ID/bomed-repo/web:$COMMIT_SHA'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/bolo-repo/web:$COMMIT_SHA'
       - '-t'
-      - 'us-central1-docker.pkg.dev/$PROJECT_ID/bomed-repo/web:latest'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/bolo-repo/web:latest'
       - '--build-arg'
       - 'DATABASE_URL=$_DATABASE_URL'
       - '.'
@@ -18,7 +18,7 @@ steps:
     args:
       - 'push'
       - '--all-tags'
-      - 'us-central1-docker.pkg.dev/$PROJECT_ID/bomed-repo/web'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/bolo-repo/web'
 
   # Deploy to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -29,7 +29,7 @@ steps:
       - 'deploy'
       - 'bomed-web'
       - '--image'
-      - 'us-central1-docker.pkg.dev/$PROJECT_ID/bomed-repo/web:$COMMIT_SHA'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/bolo-repo/web:$COMMIT_SHA'
       - '--region'
       - 'us-central1'
       - '--platform'
@@ -53,5 +53,5 @@ options:
 
 substitutions:
   _DATABASE_URL: ''
-  _BOLO_API_URL: 'https://api-bolo.claritrace.com'
+  _BOLO_API_URL: 'https://api.bolospot.com'
   _BOLO_API_KEY: ''
