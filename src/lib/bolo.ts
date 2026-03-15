@@ -1,7 +1,7 @@
 // Bolo API client for BoMed
 // Matches the actual Bolo relay + widget registration endpoints
 
-const API_BASE = process.env.BOLO_API_URL || 'https://api-bolo.claritrace.com';
+const API_BASE = process.env.BOLO_API_URL || 'https://bolo-api-650440848480.us-central1.run.app';
 const API_KEY = process.env.BOLO_API_KEY || '';
 
 async function request<T>(
@@ -109,9 +109,14 @@ export async function checkAccess(handle: string) {
 
 export async function lookupHandle(handle: string) {
   const clean = handle.replace(/^@/, '').toLowerCase();
-  return request<{ exists: boolean; handle: string; name: string | null }>(
-    `/@${clean}/lookup`,
-  );
+  try {
+    const user = await request<{ handle: string; name: string | null; id: string }>(
+      `/users/handle/${clean}`,
+    );
+    return { exists: true, handle: user.handle, name: user.name };
+  } catch {
+    return { exists: false, handle: clean, name: null };
+  }
 }
 
 // ─── Types ──────────────────────────────────────────────────────────
