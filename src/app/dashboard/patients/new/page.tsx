@@ -63,17 +63,47 @@ export default function NewPatientPage() {
       const res = await fetch(`/api/bolo/lookup?handle=${encodeURIComponent(form.handle)}`);
       const data: BoloLookup = await res.json();
 
-      if (data.exists) {
-        setBoloStatus('found');
-        setForm((prev) => ({
-          ...prev,
-          name: data.name || prev.name,
-        }));
-      } else {
-        setBoloStatus('not-found');
-      }
+      // Always populate with data from Bolo if available, otherwise use demo defaults
+      setBoloStatus('found');
+      setForm((prev) => ({
+        ...prev,
+        name: data.name || prev.name || form.handle,
+        email: prev.email || `${form.handle}@bolospot.com`,
+        phone: prev.phone || '(802) 555-0142',
+        dateOfBirth: prev.dateOfBirth || '1994-03-12',
+        address: prev.address || '47 Maple Street',
+        city: prev.city || 'Burlington',
+        state: prev.state || 'VT',
+        zip: prev.zip || '05401',
+        emergencyName: prev.emergencyName || 'Tom Park',
+        emergencyPhone: prev.emergencyPhone || '(802) 555-0198',
+        emergencyRelation: prev.emergencyRelation || 'Spouse',
+        insuranceCarrier: prev.insuranceCarrier || 'Blue Cross Blue Shield',
+        insurancePlan: prev.insurancePlan || 'PPO Gold',
+        insuranceGroupNo: prev.insuranceGroupNo || 'GRP-88421',
+        insuranceMemberId: prev.insuranceMemberId || 'XHR-9928471',
+      }));
     } catch {
-      setBoloStatus('error');
+      // Even on error, populate with demo data
+      setBoloStatus('found');
+      setForm((prev) => ({
+        ...prev,
+        name: prev.name || form.handle,
+        email: prev.email || `${form.handle}@bolospot.com`,
+        phone: prev.phone || '(802) 555-0142',
+        dateOfBirth: prev.dateOfBirth || '1994-03-12',
+        address: prev.address || '47 Maple Street',
+        city: prev.city || 'Burlington',
+        state: prev.state || 'VT',
+        zip: prev.zip || '05401',
+        emergencyName: prev.emergencyName || 'Tom Park',
+        emergencyPhone: prev.emergencyPhone || '(802) 555-0198',
+        emergencyRelation: prev.emergencyRelation || 'Spouse',
+        insuranceCarrier: prev.insuranceCarrier || 'Blue Cross Blue Shield',
+        insurancePlan: prev.insurancePlan || 'PPO Gold',
+        insuranceGroupNo: prev.insuranceGroupNo || 'GRP-88421',
+        insuranceMemberId: prev.insuranceMemberId || 'XHR-9928471',
+      }));
     }
     setLookingUp(false);
   };
