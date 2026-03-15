@@ -19,17 +19,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     href === '/dashboard' ? pathname === '/dashboard' : pathname.startsWith(href);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-[#f0f0f0]">
-      <nav className="border-b border-[#1a1a1a] px-4 sm:px-6 py-4">
+    <div className="min-h-screen bg-[#f8f9fc] text-[#1a1a2e]">
+      <nav className="border-b border-[#e0e0e0] px-4 sm:px-6 py-4 bg-white">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <Link href="/dashboard" className="flex items-center gap-2">
-            <svg width="28" height="28" viewBox="0 0 120 120" fill="none">
-              <path d="M60 8 L108 28 V72 Q108 108 60 118 Q12 108 12 72 V28 Z"
-                stroke="#00c9a7" strokeWidth="3" fill="rgba(0,201,167,0.04)"/>
-              <rect x="48" y="38" width="24" height="44" rx="3" fill="rgba(0,201,167,0.15)" stroke="#00c9a7" strokeWidth="2"/>
-              <rect x="38" y="48" width="44" height="24" rx="3" fill="rgba(0,201,167,0.15)" stroke="#00c9a7" strokeWidth="2"/>
-            </svg>
-            <span className="text-lg font-bold">BoMed</span>
+            <img src="/logo-icon.png" alt="BoMed" className="h-8" />
+            <span className="text-lg font-bold text-[#141440]">BoMed</span>
           </Link>
 
           {/* Desktop nav */}
@@ -38,12 +33,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <Link
                 key={link.href}
                 href={link.href}
-                className={`transition ${isActive(link.href) ? 'text-white font-medium' : 'text-[#888] hover:text-white'}`}
+                className={`transition ${isActive(link.href) ? 'text-[#141440] font-medium' : 'text-[#888] hover:text-[#141440]'}`}
               >
                 {link.label}
               </Link>
             ))}
-            <Link href="/dashboard/schedule" className="text-teal-400 hover:text-teal-300 transition font-medium">
+            <Link href="/dashboard/schedule" className="text-[#f0a030] hover:text-[#d08820] transition font-medium">
               + Schedule
             </Link>
           </div>
@@ -51,7 +46,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {/* Mobile menu button */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="sm:hidden p-2 text-zinc-400 hover:text-white"
+            className="sm:hidden p-2 text-[#888] hover:text-[#141440]"
             aria-label="Toggle menu"
           >
             <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
@@ -72,7 +67,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 key={link.href}
                 href={link.href}
                 onClick={() => setMenuOpen(false)}
-                className={`block py-2 px-2 rounded text-sm transition ${isActive(link.href) ? 'text-white bg-zinc-800' : 'text-[#888] hover:text-white'}`}
+                className={`block py-2 px-2 rounded text-sm transition ${isActive(link.href) ? 'text-[#141440] bg-[#f0f0f5] font-medium' : 'text-[#888] hover:text-[#141440]'}`}
               >
                 {link.label}
               </Link>
@@ -80,7 +75,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <Link
               href="/dashboard/schedule"
               onClick={() => setMenuOpen(false)}
-              className="block py-2 px-2 rounded text-sm text-teal-400 hover:text-teal-300 font-medium"
+              className="block py-2 px-2 rounded text-sm text-[#f0a030] hover:text-[#d08820] font-medium"
             >
               + Schedule
             </Link>
