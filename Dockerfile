@@ -33,4 +33,4 @@ COPY --from=builder /app/prisma ./prisma
 
 EXPOSE 8080
 
-CMD ["sh", "-c", "npx prisma db push --skip-generate && node server.js"]
+CMD ["node", "server.js"]
