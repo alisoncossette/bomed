@@ -1,0 +1,167 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Practice ───────────────────────────────────────────────────────
+
+model Practice {
+  id            String        @id @default(cuid())
+  name          String
+  handle        String        @unique  // Bolo @handle (e.g., "acmept")
+  email         String        @unique
+  phone         String?
+  address       String?
+  timezone      String        @default("America/New_York")
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  practitioners Practitioner[]
+  patients      Patient[]
+  appointments  Appointment[]
+}
+
+// ─── Practitioner ───────────────────────────────────────────────────
+
+model Practitioner {
+  id            String        @id @default(cuid())
+  name          String
+  handle        String        @unique  // Bolo @handle (e.g., "dr.smith")
+  email         String
+  specialty     String?       // "PT", "Athletic Training", "OT"
+  practiceId    String
+  isActive      Boolean       @default(true)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  practice      Practice      @relation(fields: [practiceId], references: [id])
+  appointments  Appointment[]
+  patients      PatientPractitioner[]
+  schedule      PractitionerSchedule[]
+  timeOff       TimeOff[]
+}
+
+// ─── Practitioner Schedule ───────────────────────────────────────────
+// Weekly recurring working hours (e.g., Mon 8:00–17:00)
+
+model PractitionerSchedule {
+  id              String        @id @default(cuid())
+  practitionerId  String
+  dayOfWeek       Int           // 0=Sun, 1=Mon, ... 6=Sat
+  startTime       String        // "08:00" (24h format)
+  endTime         String        // "17:00"
+  breakStart      String?       // "12:00" (optional lunch break)
+  breakEnd        String?       // "13:00"
+
+  practitioner    Practitioner  @relation(fields: [practitionerId], references: [id])
+
+  @@unique([practitionerId, dayOfWeek])
+}
+
+// ─── Time Off / Blocked Time ─────────────────────────────────────────
+
+model TimeOff {
+  id              String        @id @default(cuid())
+  practitionerId  String
+  startDate       DateTime
+  endDate         DateTime
+  reason          String?       // "Vacation", "Conference", "Personal"
+  createdAt       DateTime      @default(now())
+
+  practitioner    Practitioner  @relation(fields: [practitionerId], references: [id])
+
+  @@index([practitionerId, startDate, endDate])
+}
+
+// ─── Patient ────────────────────────────────────────────────────────
+
+model Patient {
+  id                String        @id @default(cuid())
+  name              String
+  handle            String?       @unique  // Bolo @handle (optional — only if they have one)
+  email             String
+  phone             String?
+  calendarConnected Boolean       @default(false)  // Has connected their calendar via Bolo
+  practiceId        String
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  // Demographics (synced via Bolo grants)
+  dateOfBirth       DateTime?
+  address           String?
+  city              String?
+  state             String?
+  zip               String?
+  emergencyName     String?
+  emergencyPhone    String?
+  emergencyRelation String?       // e.g., "Spouse", "Parent"
+
+  // Insurance (synced via Bolo grants)
+  insuranceCarrier  String?       // e.g., "Blue Cross Blue Shield"
+  insurancePlan     String?       // e.g., "PPO Gold"
+  insuranceGroupNo  String?
+  insuranceMemberId String?
+  insuranceEffDate  DateTime?
+  insuranceExpDate  DateTime?
+  insuranceVerified Boolean       @default(false)
+  insuranceVerifiedAt DateTime?
+
+  // Bolo sync tracking
+  boloSyncedAt        DateTime?
+  demographicsGranted Boolean     @default(false)
+  insuranceGranted    Boolean     @default(false)
+
+  practice          Practice      @relation(fields: [practiceId], references: [id])
+  appointments      Appointment[]
+  practitioners     PatientPractitioner[]
+}
+
+// ─── Patient-Practitioner relationship ──────────────────────────────
+
+model PatientPractitioner {
+  id              String        @id @default(cuid())
+  patientId       String
+  practitionerId  String
+  isPrimary       Boolean       @default(false)  // Primary practitioner for this patient
+  createdAt       DateTime      @default(now())
+
+  patient         Patient       @relation(fields: [patientId], references: [id])
+  practitioner    Practitioner  @relation(fields: [practitionerId], references: [id])
+
+  @@unique([patientId, practitionerId])
+}
+
+// ─── Appointment ────────────────────────────────────────────────────
+
+model Appointment {
+  id              String        @id @default(cuid())
+  practiceId      String
+  practitionerId  String
+  patientId       String
+  dateTime        DateTime
+  duration        Int           @default(30)  // minutes
+  status          String        @default("PENDING")  // PENDING, CONFIRMED, DECLINED, RESCHEDULED, CANCELLED, COMPLETED
+  type            String        @default("PT_SESSION")  // PT_SESSION, EVALUATION, FOLLOW_UP
+  notes           String?
+  relayMessageId  String?       // Bolo relay message ID (for tracking the availability query)
+  recurring       Boolean       @default(false)
+  recurringDay    Int?          // 0=Sun, 1=Mon, ...
+  recurringTime   String?       // "10:00" format
+  pccResourceId   String?       // PCC FHIR resource ID after successful sync
+  pccSyncedAt     DateTime?     // When last synced to PCC
+  pccSyncError    String?       // Last sync error message (null = no error)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  practice        Practice      @relation(fields: [practiceId], references: [id])
+  practitioner    Practitioner  @relation(fields: [practitionerId], references: [id])
+  patient         Patient       @relation(fields: [patientId], references: [id])
+
+  @@index([practiceId, dateTime])
+  @@index([practitionerId, dateTime])
+  @@index([patientId, dateTime])
+  @@index([status])
+}
