@@ -14,8 +14,7 @@ RUN npx prisma generate
 
 COPY . .
 
-ARG DATABASE_URL
-ENV DATABASE_URL=${DATABASE_URL}
+ENV DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder"
 RUN pnpm run build
 
 # ─── Production stage ───────────────────────────────────────────────

@@ -8,8 +8,6 @@ steps:
       - 'us-central1-docker.pkg.dev/$PROJECT_ID/bolo-repo/web:$COMMIT_SHA'
       - '-t'
       - 'us-central1-docker.pkg.dev/$PROJECT_ID/bolo-repo/web:latest'
-      - '--build-arg'
-      - 'DATABASE_URL=$_DATABASE_URL'
       - '.'
 
   # Push to Artifact Registry
@@ -35,8 +33,6 @@ steps:
       - '--platform'
       - 'managed'
       - '--allow-unauthenticated'
-      - '--set-env-vars'
-      - 'DATABASE_URL=$_DATABASE_URL,NODE_ENV=production,BOLO_API_URL=$_BOLO_API_URL,BOLO_API_KEY=$_BOLO_API_KEY'
       - '--port'
       - '8080'
       - '--memory'
@@ -51,7 +47,3 @@ steps:
 options:
   logging: CLOUD_LOGGING_ONLY
 
-substitutions:
-  _DATABASE_URL: ''
-  _BOLO_API_URL: 'https://api.bolospot.com'
-  _BOLO_API_KEY: ''
